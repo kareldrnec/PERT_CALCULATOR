@@ -8,7 +8,7 @@ app.secret_key = 'dont tell anyone'
 
 Bootstrap(app)
 
-headings = ("#", "Task Name", "Optimistic", "Most Likely", "Pessimistic", "Delete")
+headings = ("#", "Task Name", "Optimistic", "Most Likely", "Pessimistic")
 data_array = []
 results_data = []
 results = []

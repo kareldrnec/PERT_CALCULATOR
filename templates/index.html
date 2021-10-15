@@ -81,11 +81,10 @@
         {% for cell in row %}
         <th scope="col">{{ row[cell] }}</th>
         {% endfor %}
-        <th scope="col">Delete</th>
     </tr>
     {% endfor %}
     <tr class="bg-success">
-        <td scope="col" colspan="6" style="text-align:center;">Number of Critical Tasks: {{ number_of_tasks }}</td>
+        <td scope="col" colspan="5" style="text-align:center;">Number of Critical Tasks: {{ number_of_tasks }}</td>
     </tr>
     </tbody>
 </table>
