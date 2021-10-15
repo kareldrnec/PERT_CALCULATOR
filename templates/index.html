@@ -1,0 +1,149 @@
+{% extends "bootstrap/base.html" %}
+{% block title %} PERT Calculator{% endblock %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<h3>{{ message }}</h3>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <h1>PERT Calculator</h1>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add
+                Task
+            </button>
+            <a href="/clear">
+                <button type="button" class="btn btn-primary">Clean Data
+                </button>
+            </a>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Add Task</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="/form" method="POST">
+                    <div class="form-group">
+                        <label for="taskName">Task Name</label>
+                        <input type="text" class="form-control" id="taskName" name="task" aria-describedby="taskHelp"
+                               placeholder="Enter Task Name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="optimisticValue">Optimistic Value</label>
+                        <input type="number" class="form-control" id="optimisticValue" name="optimistic"
+                               aria-describedby="optimisticHelp"
+                               placeholder="Enter Optimistic Value of Task" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mostLikelyValue">Most Likely Value</label>
+                        <input type="number" class="form-control" id="mostLikelyValue" name="mostLikely"
+                               aria-describedby="mostLikelyHelp"
+                               placeholder="Enter Most Likely Value of Task" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pessimisticValue">Pessimistic Value</label>
+                        <input type="number" class="form-control" id="pessimisticValue" name="pessimistic"
+                               aria-describedby="pessimisticHelp"
+                               placeholder="Enter Pessimistic Value of Task" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" name="submit" value="Submit">Add</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<table class="table">
+    <thead>
+    <tr>
+        {% for header in headings %}
+        <th scope="col">{{ header }}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in data_array %}
+    <tr>
+        <th scope="col">{{ loop.index }}.</th>
+        {% for cell in row %}
+        <th scope="col">{{ row[cell] }}</th>
+        {% endfor %}
+        <th scope="col">Delete</th>
+    </tr>
+    {% endfor %}
+    <tr class="bg-success">
+        <td scope="col" colspan="6" style="text-align:center;">Number of Critical Tasks: {{ number_of_tasks }}</td>
+    </tr>
+    </tbody>
+</table>
+<form action="/calculate" method="POST">
+    <label for="desiredTime">Desired Completion Time</label>
+    <input type="number" id="desiredTime" name="desiredTime" min="1" required>
+    <button type="submit" class="btn btn-primary" name="submit" value="Submit">Calculate</button>
+</form>
+
+{% if results_data|length >= 1 %}
+<div style="margin-top: 10px;">
+    <table class="table">
+        <thead>
+        <tr class="bg-primary">
+            <th scope="col" colspan="5" style="text-align:center;">Results</th>
+        </tr>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Task Name</th>
+            <th scope="col">Expected Time</th>
+            <th scope="col">Standard Deviation</th>
+            <th scope="col">Variance</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in results_data %}
+        <tr>
+            <th scope="col">{{ loop.index }}.</th>
+            {% for cell in row %}
+            <th scope="col">{{ row[cell] }}</th>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        <tr class="bg-success">
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col">Σ</th>
+            <th scope="col"></th>
+            <th scope="col">Σ</th>
+        </tr>
+        <tr>
+            {% for res in results %}
+            <th scope="col"></th>
+            <th scope="col"></th>
+            <th scope="col">{{ res["sumExpectedValue"] }}</th>
+            <th scope="col"></th>
+            <th scope="col">{{ res["sumVariance"] }}</th>
+            {% endfor %}
+        </tr>
+        <tr>
+            <th scope="col" colspan="5" style="text-align:center;">Z: {{ results[0]["zValue"] }} P: {{
+                results[0]["probability"] }} %
+            </th>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+
+{% endblock %}
