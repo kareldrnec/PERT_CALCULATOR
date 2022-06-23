@@ -1,5 +1,5 @@
 {% extends "bootstrap/base.html" %}
-{% block title %} PERT Calculator{% endblock %}
+{% block title %} PERT {% endblock %}
 
 {% block content %}
 {% with messages = get_flashed_messages() %}
@@ -9,16 +9,15 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
-
 <div class="container">
     <div class="row">
         <div class="col text-center">
-            <h1>PERT Calculator</h1>
+            <h1>PERT</h1>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">Add
                 Task
             </button>
             <a href="/clear">
-                <button type="button" class="btn btn-primary">Clean Data
+                <button type="button" class="btn btn-primary">Clear Data
                 </button>
             </a>
         </div>
@@ -129,20 +128,50 @@
             {% for res in results %}
             <th scope="col"></th>
             <th scope="col"></th>
-            <th scope="col">{{ res["sumExpectedValue"] }}</th>
+            <th scope="col" id="sumEV">{{ res["sumExpectedValue"] }}</th>
             <th scope="col"></th>
-            <th scope="col">{{ res["sumVariance"] }}</th>
+            <th scope="col" id="sumV">{{ res["sumVariance"] }}</th>
             {% endfor %}
         </tr>
         <tr>
-            <th scope="col" colspan="5" style="text-align:center;">Z: {{ results[0]["zValue"] }} P: {{
+            <th scope="col" colspan="5" style="text-align:center;" id="desiredTimeResult"></th>
+        </tr>
+        <tr>
+            <th scope="col" colspan="5" style="text-align:center;">(SciPy) P: {{
                 results[0]["probability"] }} %
             </th>
+        </tr>
+        <tr>
+            <th scope="col" colspan="5" style="text-align:center;" id="jstatProb"></th>
         </tr>
         </tbody>
     </table>
 </div>
 {% endif %}
+{% block javascript %}
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js">
+</script>
+<script type="text/javascript">
+    var sumExpectedValue = 0;
+    var sumVariance = 0;
+    var zValue = 0;
+    var desiredTime = 0;
+    {% for res in results %}
+        sumExpectedValue = parseFloat('{{ res["sumExpectedValue"] }}');
+        sumVariance = parseFloat('{{ res["sumVariance"]}}');
+        zValue = {{ res["zValue"] }}
+        desiredTime = parseFloat({{ res["desiredTime"] }})
+    {% endfor %}
+    if(sumExpectedValue && sumExpectedValue >= 0){
+        var jstatProb = jStat.normal.cdf(desiredTime, sumExpectedValue, Math.sqrt(sumVariance)) * 100
+        document.getElementById("desiredTimeResult").innerHTML = "Desired Completion Time: " + desiredTime
+            + ", Z: " + zValue;
+        document.getElementById("jstatProb").innerHTML = "(jStat) P: " + jstatProb + " %";
+    }
 
-
+</script>
 {% endblock %}
+{% endblock %}
+
+
+

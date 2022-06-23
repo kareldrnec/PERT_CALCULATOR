@@ -20,13 +20,15 @@ def calculate_pert(data_array, desired_time):
         sum_var += variance
     z = calculate_z_value(sum_et, sum_var, int(desired_time))
     print(z)
+    print(round(z, 3))
+    print(norm.ppf(0.75695))
     return result_arr, {
         "sumExpectedValue": sum_et,
         "sumVariance": sum_var,
+        "desiredTime": desired_time,
         "zValue": round(z, 3),
-        "probability": round(norm.cdf(z), 3) * 100
+        "probability": norm.cdf(round(z, 3)) * 100
     }
-
 
 
 def get_expected_time(o, m, p):
